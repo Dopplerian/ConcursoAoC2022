@@ -1,7 +1,7 @@
 type INT = u8;
 
 const CANTIDAD_RECURSOS: usize = 4;
-const MAX_TIEMPO: INT = 30;
+const MAX_TIEMPO: INT = 29;
 
 type Plano = [[INT; CANTIDAD_RECURSOS]; CANTIDAD_RECURSOS];
 
@@ -28,13 +28,20 @@ pub fn explorar(plano: Plano) -> INT {
 	return max_actual;
 }
 
+#[derive(Copy, Clone, Hash, Eq, PartialEq)]
+enum Fabrica {
+	FABRICANDO(INT),
+	RECUPERANDOSE,
+	OCIOSA,
+}
+
 #[derive(Clone, Copy, Hash, Eq, PartialEq)]
 struct Nodo<'a> {
 	minuto: INT,
 	plano: &'a Plano,
 	recursos: [INT; CANTIDAD_RECURSOS],
 	robots: [INT; CANTIDAD_RECURSOS],
-	fabricando: Option<INT>,
+	fabrica: Fabrica,
 }
 
 impl<'a> Nodo<'a> {
@@ -44,7 +51,7 @@ impl<'a> Nodo<'a> {
 			plano: plano,
 			recursos: [0,0,0,0],
 			robots: [1,0,0,0],
-			fabricando: None,
+			fabrica: Fabrica::OCIOSA,
 		}
 	}
 
@@ -55,9 +62,11 @@ impl<'a> Nodo<'a> {
 	}
 
 	fn recoger_robot(&mut self) {
-		if let Some(robot) = self.fabricando {
+		if let Fabrica::FABRICANDO(robot) = self.fabrica {
 			self.robots[robot as usize] += 1;
-			self.fabricando = None;
+			self.fabrica = Fabrica::RECUPERANDOSE;
+		} else if self.fabrica == Fabrica::RECUPERANDOSE {
+			self.fabrica = Fabrica::OCIOSA;
 		}
 		self.minuto += 1;
 	}
@@ -72,15 +81,15 @@ impl<'a> Nodo<'a> {
 				return None;
 			}
 			let restante = self.recursos[i] - coste[i];
-			if coste[i] > 0 && restante < self.robots[i] + 2 {
+			if coste[i] > 0 && restante < self.robots[i] {
 				es_optimo = true;
 			}
 			res.recursos[i] = restante;
 		}
-		if !es_optimo {
+		if !es_optimo && self.fabrica == Fabrica::OCIOSA {
 			return None;
 		}
-		res.fabricando = Some(robot);
+		res.fabrica = Fabrica::FABRICANDO(robot);
 		return Some(res);
 	}
 
