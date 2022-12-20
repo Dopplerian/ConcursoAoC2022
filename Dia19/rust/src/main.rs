@@ -1,7 +1,7 @@
-type INT = u16;
+type INT = u8;
 
 const CANTIDAD_RECURSOS: usize = 4;
-const MAX_TIEMPO: INT = 32;
+const MAX_TIEMPO: INT = 29;
 
 type Plano = [[INT; CANTIDAD_RECURSOS]; CANTIDAD_RECURSOS];
 
@@ -158,10 +158,11 @@ fn main() {
 	// 	let res = explorar(PLANOS_EJEMPLOS[i]);
 	// 	println!("{i}: {res}");
 	// }
-	let mut acumulador: INT = 1;
+	let mut acumulador: u16 = 1;
 	for i in 0..3 {
-		acumulador *= explorar(PLANOS[i]);
-		println!("{i}");
+		let res = explorar(PLANOS[i]);
+		acumulador *= res as u16;
+		println!("{res}");
 	}
 	println!("{acumulador}");
 }
