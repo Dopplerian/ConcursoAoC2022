@@ -1,27 +1,28 @@
 type INT = u8;
 
 const CANTIDAD_RECURSOS: usize = 4;
-const MAX_TIEMPO: INT = 29;
+const MAX_TIEMPO: INT = 30;
 
 type Plano = [[INT; CANTIDAD_RECURSOS]; CANTIDAD_RECURSOS];
 
 pub fn explorar(plano: Plano) -> INT {
-	// use std::collections::LinkedList;
+	use std::collections::LinkedList;
 	use std::collections::HashSet;
 	use std::cmp::max;
 	let inicio = Nodo::new(&plano);
 	let mut max_actual: INT = 0;
-	let mut pila = vec![inicio];
+	// let mut pila = vec![inicio];
+	let mut pila = LinkedList::from([inicio]);
 	let mut visitados = HashSet::<Nodo>::new();
 	while pila.len() != 0 {
-		let actual = pila.pop().unwrap();
+		let actual = pila.pop_front().unwrap();
 		if visitados.contains(&actual) {
 			continue;
 		}
 		visitados.insert(actual);
 		max_actual = max(max_actual, actual.recursos[3]);
 		for vecino in actual.vecinos() {
-			pila.push(vecino);
+			pila.push_front(vecino);
 		}
 	}
 	return max_actual;
@@ -64,13 +65,14 @@ impl<'a> Nodo<'a> {
 	fn crear_robot(&self, robot: INT) -> Option<Self> {
 		let mut res = self.clone();
 		let coste = self.plano[robot as usize];
+		// Comprobar esta optimización
 		let mut es_optimo = false;
 		for i in 0..CANTIDAD_RECURSOS {
 			if self.recursos[i] < coste[i] {
 				return None;
 			}
 			let restante = self.recursos[i] - coste[i];
-			if coste[i] > 0 && restante < self.robots[i] {
+			if coste[i] > 0 && restante < self.robots[i] + 2 {
 				es_optimo = true;
 			}
 			res.recursos[i] = restante;
