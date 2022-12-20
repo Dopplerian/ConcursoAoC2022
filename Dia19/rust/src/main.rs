@@ -1,7 +1,7 @@
 type INT = u8;
 
 const CANTIDAD_RECURSOS: usize = 4;
-const MAX_TIEMPO: INT = 29;
+const MAX_TIEMPO: INT = 32;
 
 type Plano = [[INT; CANTIDAD_RECURSOS]; CANTIDAD_RECURSOS];
 
@@ -115,8 +115,16 @@ impl<'a> Nodo<'a> {
 		if self.tiene_sentido_esperar() {
 			res.push(self.clone());
 		}
-		for i in 0..CANTIDAD_RECURSOS {
-			if let Some(creado) = self.crear_robot(i as INT) {
+		if let Some(creado) = self.crear_robot(3) {
+			res.push(creado);
+		}
+		if let Some(creado) = self.crear_robot(2) {
+			res.push(creado);
+		} else { // Estos if's deberían estar fuera del else, ni puta idea de por qué esto funciona.
+			if let Some(creado) = self.crear_robot(1) {
+				res.push(creado);
+			}
+			if let Some(creado) = self.crear_robot(0) {
 				res.push(creado);
 			}
 		}
