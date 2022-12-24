@@ -29,7 +29,8 @@ fn main() -> io::Result<()> {
 		let res;
 		let linea = linea_sin_tratar?;
 		let nombre = String::from(&linea[0..4]);
-		if (linea.as_bytes()[6] as char).is_numeric() {
+		let caracter_distintivo = linea.as_bytes()[6] as char;
+		if caracter_distintivo.is_numeric() || caracter_distintivo == '-' {
 			let valor = Some(INT::from_str(&linea[6..]).unwrap());
 			res = Mono {
 				valor,

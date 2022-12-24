@@ -37,16 +37,6 @@ impl Operacion {
 			Self::DIVISION => val1 / val2,
 		}
 	}
-
-	pub fn inversa(&self, primer: bool) -> Self {
-		match (self, primer) {
-			(Self::SUMA, _) => Self::RESTA,
-			(Self::RESTA, _) => Self::SUMA,
-			(Self::MULTIPLICACION, _) => Self::DIVISION,
-			(Self::DIVISION, false) => Self::DIVISION,
-			(Self::DIVISION, true) => Self::MULTIPLICACION,
-		}
-	}
 }
 
 fn main() -> io::Result<()> {
@@ -122,15 +112,15 @@ fn resolver(mono: &str, mapa: &HashMap<String, Mono>, valor_esperado: INT, no_re
 		// valor_esperado iop valor_resuelto = valor_sin_resolver
 		let valor_resuelto = computar(hijo_resuelto.clone(), mapa);
 		let operacion = h.1;
-		let operacion_inversa = operacion.inversa(orden);
-		let valor_necesario = if operacion_inversa == Operacion::DIVISION {
-			if !orden {
-				operacion_inversa.aplicar(valor_resuelto, valor_esperado)
-			} else {
-				operacion_inversa.aplicar(valor_esperado, valor_resuelto)
+		let valor_necesario = {
+			match (operacion, !orden) {
+				(Operacion::SUMA, _) => valor_esperado - valor_resuelto,
+				(Operacion::MULTIPLICACION, _) => valor_esperado / valor_resuelto,
+				(Operacion::RESTA, false) => valor_resuelto - valor_esperado,
+				(Operacion::RESTA, true) => valor_resuelto + valor_esperado,
+				(Operacion::DIVISION, false) => valor_resuelto / valor_esperado,
+				(Operacion::DIVISION, true) => valor_resuelto * valor_esperado,
 			}
-		} else {
-			operacion_inversa.aplicar(valor_esperado, valor_resuelto)
 		};
 		return resolver(hijo_sin_resolver, mapa, valor_necesario, no_resueltos);
 	}
@@ -165,18 +155,6 @@ fn camino(inicio_i: &str, meta_i: &str, mapa: &HashMap<String, Mono>) -> HashSet
 		res.insert(actual.clone());
 	}
 	return res;
-}
-
-fn buscar(actual: Mono, meta: Mono, mapa: &HashMap<String, Mono>) {
-	if actual == meta {
-		println!("1392\\/");
-	}
-	if let Some(par) = actual.hijos {
-		let hijo_izq = mapa.get(&par.0[0]).unwrap();
-		let hijo_der = mapa.get(&par.0[1]).unwrap();
-		buscar(hijo_izq.clone(), meta.clone(), mapa);
-		buscar(hijo_der.clone(), meta.clone(), mapa);
-	}
 }
 
 fn computar(root: String, mapa: &HashMap<String, Mono>) -> INT {
