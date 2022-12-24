@@ -85,7 +85,6 @@ fn main() -> io::Result<()> {
 		mapa.insert(nombre, res);
 	}
 	let camino = camino("root", "humn", &mapa);
-	// println!("{camino:?}");
 	let root = mapa.get("root").unwrap();
 	let hijo1 = mapa.get(&root.hijos.clone().unwrap().0[0]).unwrap();
 	let hijo2 = mapa.get(&root.hijos.clone().unwrap().0[1]).unwrap();
@@ -123,7 +122,7 @@ fn resolver(mono: &str, mapa: &HashMap<String, Mono>, valor_esperado: INT, no_re
 		// valor_esperado iop valor_resuelto = valor_sin_resolver
 		let valor_resuelto = computar(hijo_resuelto.clone(), mapa);
 		let operacion = h.1;
-		let operacion_inversa = operacion.inversa(!orden);
+		let operacion_inversa = operacion.inversa(orden);
 		let valor_necesario = if operacion_inversa == Operacion::DIVISION {
 			if !orden {
 				operacion_inversa.aplicar(valor_resuelto, valor_esperado)
