@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+from copy import copy
+
 archivo = map(lambda x: x.rstrip('\n'), iter(open("input.txt","r").readlines()))
 
 mapa = set()
@@ -61,22 +63,11 @@ def ronda(mapa, i):
 			mapa.remove(val[0])
 			mapa.add(key)
 
-
-for i in range(10):
-	ronda(mapa, i)
-
-max_x = -float('inf')
-max_y = -float('inf')
-min_x = float('inf')
-min_y = float('inf')
-
-for x in mapa:
-	max_x = max(max_x, x[0])
-	max_y = max(max_y, x[1])
-	min_x = min(min_x, x[0])
-	min_y = min(min_y, x[1])
-
-len_x = max_x - min_x + 1
-len_y = max_y - min_y + 1
-area = len_x*len_y - len(mapa)
-print(area)
+i = 1
+while True:
+	mapa_previo = copy(mapa)
+	ronda(mapa, i - 1)
+	if mapa_previo == mapa:
+		print(i)
+		break
+	i += 1
